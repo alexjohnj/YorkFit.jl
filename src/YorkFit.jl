@@ -22,4 +22,22 @@ function lsq{T<:Real}(Xs::Vector{T}, Ys::Vector{T})::Tuple{T,T}
     (m[1], m[2])
 end
 
+fit{T<:Real}(Xs::Vector{T}, Ys::Vector{T}, σX::T, σYs::Vector{T}, rs::Vector{T}; kwargs...) =
+    fit(Xs, Ys, fill(σX, length(Xs)), σYs, rs; kwargs...)
+fit{T<:Real}(Xs::Vector{T}, Ys::Vector{T}, σX::T, σYs::Vector{T}, r::T=T(0); kwargs...) =
+    fit(Xs, Ys, fill(σX, length(Xs)), σYs, fill(r, length(Xs)); kwargs...)
+fit{T<:Real}(Xs::Vector{T}, Ys::Vector{T}, σXs::Vector{T}, σY::T, rs::Vector{T}; kwargs...) =
+    fit(Xs, Ys, σXs, fill(σY, length(Ys)), rs; kwargs...)
+fit{T<:Real}(Xs::Vector{T}, Ys::Vector{T}, σXs::Vector{T}, σY::T, r::T=T(0); kwargs...) =
+    fit(Xs, Ys, σXs, fill(σY, length(Ys)), fill(r, length(Xs)); kwargs...)
+fit{T<:Real}(Xs::Vector{T}, Ys::Vector{T}, σX::T, σY::T, rs::Vector{T}; kwargs...) =
+    fit(Xs, Ys, fill(σX, length(Xs)), fill(σY, length(Ys)), rs; kwargs...)
+fit{T<:Real}(Xs::Vector{T}, Ys::Vector{T}, σX::T, σY::T, r::T=T(0); kwargs...) =
+    fit(Xs, Ys, fill(σX, length(Xs)), fill(σY, length(Ys)), fill(r, length(Xs)); kwargs...)
+fit{T<:Real}(Xs::Vector{T}, Ys::Vector{T}, σXs::Vector{T}, σYs::Vector{T}, r::T=T(0); kwargs...) =
+    fit(Xs, Ys, σXs, σYs, fill(r, length(Xs)); kwargs...)
+function fit{T<:Real}(Xs::Vector{T}, Ys::Vector{T}, σXs::Vector{T}, σYs::Vector{T}, rs::Vector{T}; iter=20, tol=1E-6)
+    println(iter, tol)
+end
+
 end # module
