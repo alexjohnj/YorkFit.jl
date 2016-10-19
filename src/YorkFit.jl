@@ -36,8 +36,45 @@ fit{T<:Real}(Xs::Vector{T}, Ys::Vector{T}, σX::T, σY::T, r::T=T(0); kwargs...)
     fit(Xs, Ys, fill(σX, length(Xs)), fill(σY, length(Ys)), fill(r, length(Xs)); kwargs...)
 fit{T<:Real}(Xs::Vector{T}, Ys::Vector{T}, σXs::Vector{T}, σYs::Vector{T}, r::T=T(0); kwargs...) =
     fit(Xs, Ys, σXs, σYs, fill(r, length(Xs)); kwargs...)
-function fit{T<:Real}(Xs::Vector{T}, Ys::Vector{T}, σXs::Vector{T}, σYs::Vector{T}, rs::Vector{T}; iter=20, tol=1E-6)
-    println(iter, tol)
+function fit{T<:Real}(Xs::Vector{T}, Ys::Vector{T}, σXs::Vector{T}, σYs::Vector{T}, rs::Vector{T}; niter=400, tol=1E-15)::Tuple{T,T,T,T}
+    # TODO: Check for dimension mismatch of vectors
+    (a, b) = lsq(Xs, Ys)
+
+    ωXs = ω.(σXs)
+    ωYs = ω.(σYs)
+    αs = α.(ωXs, ωYs)
+
+    Ws = zeros(length(Xs))
+    βs = zeros(length(Xs))
+    barX = 0
+    barY = 0
+
+    for i in 1:niter
+        Ws = W.(ωXs, ωYs, rs, b, αs)
+        barX = barvar(Ws, Xs)
+        barY = barvar(Ws, Ys)
+        Us = Xs - barX
+        Vs = Ys - barY
+        βs = β.(Ws, Us, Vs, ωXs, ωYs, b, rs, αs)
+
+        b_old = b
+        b = sum(Ws .* βs .* Vs) / sum(Ws .* βs .* Us)
+
+        if abs((b - b_old) / b) < tol
+            break
+        end
+    end
+
+    a = barY - b * barX
+    # Adjusted x values
+    xs = barX + βs
+    barx = sum(Ws .* xs) / sum(Ws)
+    us = xs - barx
+
+    σb = sqrt(sum(Ws .* us.^2)^-1)
+    σa = sqrt(sum(Ws)^-1 + barx^2 * σb^2)
+
+    return (a, b, σa, σb)
 end
 
 end # module
