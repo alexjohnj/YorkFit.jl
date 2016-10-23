@@ -1,5 +1,7 @@
 module YorkFit
 
+export fit
+
 """Calculate the weight of the error `σX`."""
 ω(σX::Real)::Real = σX^-2
 α{T<:Real}(ωX::T, ωY::T)::T = sqrt(ωX * ωY)
