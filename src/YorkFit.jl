@@ -22,6 +22,52 @@ function lsq{T<:Real}(Xs::Vector{T}, Ys::Vector{T})::Tuple{T,T}
     (m[1], m[2])
 end
 
+"""
+    fit{T<:Real}(Xs::Vector{T}, Ys::Vector{T}, σX::T, σYs::Vector{T}, rs::Vector{T}; kwargs...)
+    fit{T<:Real}(Xs::Vector{T}, Ys::Vector{T}, σX::T, σYs::Vector{T}, r::T=T(0); kwargs...)
+    fit{T<:Real}(Xs::Vector{T}, Ys::Vector{T}, σXs::Vector{T}, σY::T, rs::Vector{T}; kwargs...)
+    fit{T<:Real}(Xs::Vector{T}, Ys::Vector{T}, σXs::Vector{T}, σY::T, r::T=T(0); kwargs...)
+    fit{T<:Real}(Xs::Vector{T}, Ys::Vector{T}, σX::T, σY::T, rs::Vector{T}; kwargs...)
+    fit{T<:Real}(Xs::Vector{T}, Ys::Vector{T}, σX::T, σY::T, r::T=T(0); kwargs...)
+    fit{T<:Real}(Xs::Vector{T}, Ys::Vector{T}, σXs::Vector{T}, σYs::Vector{T}, r::T=T(0); kwargs...)
+
+    fit{T<:Real}(Xs::Vector{T}, Ys::Vector{T}, σXs::Vector{T}, σYs::Vector{T}, rs::Vector{T}; kwargs...)::Tuple{T,T,T,T}
+
+Fits a slope and intercept to a set of observations using the method of York et
+al. (2004).
+
+Arguments
+=========
+
+- `Xs` -- A vector of observations.
+- `Ys` -- A vector of observations related to `Xs` by `Ys = a + b * Xs`.
+- `σXs` -- Errors in the observations in `Xs`. A vector of equal length to `Xs` or
+  a scalar value if all the errors are equal.
+- `σYs` -- Errors in the observations in `Ys`. A vector of equal length to `Ys` or
+  a scalar value if all the errors are equal.
+- `rs` -- Correlation coefficient between errors. A vector of equal length to
+  `Xs` and `Ys` or a scalar value if the coefficient is constant. Defaults to 0.
+
+Keyword Arguments
+==================
+
+- `niter=400` -- Number of iterations to calculate the slope `b` with.
+- `tol=1E-15` -- Stopping criteria. When the difference between two successive
+  iterations of `b` falls below this, the iterations stop.
+
+Returns
+=======
+
+A 4-tuple containing `(a, b, σa, σb)` where `a` is the intercept, `b` is the
+slope and `σa` and `σb` are the errors in the intercept and slope.
+
+References
+==========
+
+York, D., Evensen, N.M., Martınez, M.L. and Delgado, J.D.B., 2004. Unified
+equations for the slope, intercept, and standard errors of the best straight
+line. American Journal of Physics, 72(3), pp.367-375.
+"""
 fit{T<:Real}(Xs::Vector{T}, Ys::Vector{T}, σX::T, σYs::Vector{T}, rs::Vector{T}; kwargs...) =
     fit(Xs, Ys, fill(σX, length(Xs)), σYs, rs; kwargs...)
 fit{T<:Real}(Xs::Vector{T}, Ys::Vector{T}, σX::T, σYs::Vector{T}, r::T=T(0); kwargs...) =
